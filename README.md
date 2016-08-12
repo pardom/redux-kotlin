@@ -3,7 +3,7 @@
 
 # redux-kotlin
 
-Redux for Kotlin
+[Redux](http://redux.js.org/) for Kotlin
 
 Download
 --------
