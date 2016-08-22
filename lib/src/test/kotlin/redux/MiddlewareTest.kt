@@ -1,7 +1,6 @@
 package redux
 
 import org.jetbrains.spek.api.Spek
-import org.mockito.Mockito.`when` as upon
 
 /*
  * Copyright (C) 2016 Michael Pardo
@@ -21,12 +20,12 @@ import org.mockito.Mockito.`when` as upon
 
 class MiddlewareTest : Spek({
 
-	describe("Middleware") {
+    describe("Middleware") {
 
-		describe("apply") {
+        describe("apply") {
 
-		}
+        }
 
-	}
+    }
 
 })

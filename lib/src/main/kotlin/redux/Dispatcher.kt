@@ -18,6 +18,6 @@ package redux
 
 interface Dispatcher {
 
-	fun dispatch(action: Any): Any
+    fun dispatch(action: Any): Any
 
 }

@@ -7,6 +7,10 @@ repositories {
 	maven { url "http://repository.jetbrains.com/all" }
 }
 
+configurations {
+	ktlint
+}
+
 sourceSets {
 	main.kotlin.srcDirs += 'src/main/kotlin'
 	test.kotlin.srcDirs += 'src/test/kotlin'
@@ -19,6 +23,14 @@ dependencies {
 	testCompile 'com.nhaarman:mockito-kotlin:0.3.1'
 	testCompile 'org.jetbrains.spek:spek:1.0.9'
 	testCompile 'org.mockito:mockito-core:2.0.86-beta'
+
+	ktlint 'com.github.shyiko:ktlint:0.1.2'
+}
+
+task ktlint(type: JavaExec) {
+	main = "com.github.shyiko.ktlint.Main"
+	classpath = configurations.ktlint
+	args "src/**/*.kt"
 }
 
 task sourcesJar(type: Jar, dependsOn: classes) {
@@ -35,3 +47,5 @@ artifacts {
 	archives sourcesJar
 	archives javadocJar
 }
+
+check.dependsOn ktlint

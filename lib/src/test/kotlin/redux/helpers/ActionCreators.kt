@@ -20,10 +20,10 @@ import redux.helpers.Todos.Action
 
 object ActionCreators {
 
-	fun unknownAction() = Todos.Action.Unknown()
+    fun unknownAction() = Todos.Action.Unknown()
 
-	fun addTodo(name: String) = Action.AddTodo(name)
+    fun addTodo(name: String) = Action.AddTodo(name)
 
-	fun addTodoAsync(name: String) = Action.AddTodoAsync(name)
+    fun addTodoAsync(name: String) = Action.AddTodoAsync(name)
 
 }

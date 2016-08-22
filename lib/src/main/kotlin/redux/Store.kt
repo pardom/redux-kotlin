@@ -18,119 +18,119 @@ package redux
 
 interface Store<S : Any> : Dispatcher {
 
-	fun getState(): S
+    fun getState(): S
 
-	fun subscribe(subscriber: Subscriber): Subscription
+    fun subscribe(subscriber: Subscriber): Subscription
 
-	fun replaceReducer(reducer: Reducer<S>)
+    fun replaceReducer(reducer: Reducer<S>)
 
-	interface Creator<S : Any> {
+    interface Creator<S : Any> {
 
-		fun create(reducer: Reducer<S>, initialState: S, enhancer: Enhancer<S>? = null): Store<S>
+        fun create(reducer: Reducer<S>, initialState: S, enhancer: Enhancer<S>? = null): Store<S>
 
-	}
+    }
 
-	interface Enhancer<S : Any> {
+    interface Enhancer<S : Any> {
 
-		fun enhance(next: Creator<S>): Creator<S>
+        fun enhance(next: Creator<S>): Creator<S>
 
-	}
+    }
 
-	interface Subscriber {
+    interface Subscriber {
 
-		fun onStateChanged()
+        fun onStateChanged()
 
-	}
+    }
 
-	interface Subscription {
+    interface Subscription {
 
-		fun unsubscribe()
+        fun unsubscribe()
 
-	}
+    }
 
-	private class Impl<S : Any> : Store<S> {
+    private class Impl<S : Any> : Store<S> {
 
-		private var reducer: Reducer<S>
-		private var state: S
-		private var subscribers = mutableListOf<Subscriber>()
+        private var reducer: Reducer<S>
+        private var state: S
+        private var subscribers = mutableListOf<Subscriber>()
 
-		private var isDispatching = false
+        private var isDispatching = false
 
-		private constructor(reducer: Reducer<S>, state: S) {
-			this.reducer = reducer
-			this.state = state
-		}
+        private constructor(reducer: Reducer<S>, state: S) {
+            this.reducer = reducer
+            this.state = state
+        }
 
-		override fun dispatch(action: Any): Any {
-			if (isDispatching) {
-				throw IllegalAccessError("Reducers may not dispatch actions.")
-			}
+        override fun dispatch(action: Any): Any {
+            if (isDispatching) {
+                throw IllegalAccessError("Reducers may not dispatch actions.")
+            }
 
-			try {
-				isDispatching = true
-				state = reducer.reduce(state, action)
-			}
-			finally {
-				isDispatching = false
-			}
+            try {
+                isDispatching = true
+                state = reducer.reduce(state, action)
+            }
+            finally {
+                isDispatching = false
+            }
 
-			subscribers.forEach { it.onStateChanged() }
+            subscribers.forEach { it.onStateChanged() }
 
-			return action
-		}
+            return action
+        }
 
-		override fun getState(): S {
-			return state
-		}
+        override fun getState(): S {
+            return state
+        }
 
-		override fun subscribe(subscriber: Subscriber): Subscription {
-			subscribers.add(subscriber)
+        override fun subscribe(subscriber: Subscriber): Subscription {
+            subscribers.add(subscriber)
 
-			return object : Subscription {
+            return object : Subscription {
 
-				override fun unsubscribe() {
-					subscribers.remove(subscriber)
-				}
+                override fun unsubscribe() {
+                    subscribers.remove(subscriber)
+                }
 
-			}
-		}
+            }
+        }
 
-		override fun replaceReducer(reducer: Reducer<S>) {
-			this.reducer = reducer
-		}
+        override fun replaceReducer(reducer: Reducer<S>) {
+            this.reducer = reducer
+        }
 
-		class ImplCreator<S : Any> : Creator<S> {
+        class ImplCreator<S : Any> : Creator<S> {
 
-			override fun create(reducer: Reducer<S>, initialState: S, enhancer: Enhancer<S>?): Store<S> {
-				return Impl(reducer, initialState)
-			}
+            override fun create(reducer: Reducer<S>, initialState: S, enhancer: Enhancer<S>?): Store<S> {
+                return Impl(reducer, initialState)
+            }
 
-		}
+        }
 
-	}
+    }
 
-	companion object {
+    companion object {
 
-		val INIT = Any()
+        val INIT = Any()
 
-		fun <S : Any> create(
-				reducer: Reducer<S>,
-				initialState: S,
-				enhancer: Enhancer<S>? = null): Store<S> {
+        fun <S : Any> create(
+                reducer: Reducer<S>,
+                initialState: S,
+                enhancer: Enhancer<S>? = null): Store<S> {
 
-			val creator = Impl.ImplCreator<S>()
-			val store = if (enhancer != null) {
-				enhancer.enhance(creator).create(reducer, initialState)
-			}
-			else {
-				creator.create(reducer, initialState)
-			}
+            val creator = Impl.ImplCreator<S>()
+            val store = if (enhancer != null) {
+                enhancer.enhance(creator).create(reducer, initialState)
+            }
+            else {
+                creator.create(reducer, initialState)
+            }
 
-			store.dispatch(INIT)
+            store.dispatch(INIT)
 
-			return store
-		}
+            return store
+        }
 
-	}
+    }
 
 }

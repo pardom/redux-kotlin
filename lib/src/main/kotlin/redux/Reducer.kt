@@ -18,22 +18,22 @@ package redux
 
 interface Reducer<S : Any> {
 
-	fun reduce(state: S, action: Any): S
+    fun reduce(state: S, action: Any): S
 
-	private class CombinedReducer<S : Any>(vararg val reducers: Reducer<S>) : Reducer<S> {
+    private class CombinedReducer<S : Any>(vararg val reducers: Reducer<S>) : Reducer<S> {
 
-		override fun reduce(state: S, action: Any): S {
-			return reducers.fold(state) { state, reducer -> reducer.reduce(state, action) }
-		}
+        override fun reduce(state: S, action: Any): S {
+            return reducers.fold(state) { state, reducer -> reducer.reduce(state, action) }
+        }
 
-	}
+    }
 
-	companion object {
+    companion object {
 
-		fun <S : Any> combine(vararg reducers: Reducer<S>): Reducer<S> {
-			return CombinedReducer(*reducers)
-		}
+        fun <S : Any> combine(vararg reducers: Reducer<S>): Reducer<S> {
+            return CombinedReducer(*reducers)
+        }
 
-	}
+    }
 
 }

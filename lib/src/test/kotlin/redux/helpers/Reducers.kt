@@ -23,32 +23,32 @@ import redux.helpers.Todos.Todo
 
 object Reducers {
 
-	fun id(state: State): Int {
-		return state.todos.fold(0) { result, item ->
-			if (item.id > result) item.id else result
-		} + 1
-	}
+    fun id(state: State): Int {
+        return state.todos.fold(0) { result, item ->
+            if (item.id > result) item.id else result
+        } + 1
+    }
 
-	object TODOS : Reducer<State> {
+    object TODOS : Reducer<State> {
 
-		override fun reduce(state: State, action: Any): State {
-			return when (action) {
-				is Action.AddTodo -> state.copy(todos = state.todos + Todo(id(state), action.todo))
-				else -> state
-			}
-		}
+        override fun reduce(state: State, action: Any): State {
+            return when (action) {
+                is Action.AddTodo -> state.copy(todos = state.todos + Todo(id(state), action.todo))
+                else -> state
+            }
+        }
 
-	}
+    }
 
-	object TODOS_REVERSE : Reducer<State> {
+    object TODOS_REVERSE : Reducer<State> {
 
-		override fun reduce(state: State, action: Any): State {
-			return when (action) {
-				is Action.AddTodo -> state.copy(todos = listOf(Todo(id(state), action.todo)) + state.todos)
-				else -> state
-			}
-		}
+        override fun reduce(state: State, action: Any): State {
+            return when (action) {
+                is Action.AddTodo -> state.copy(todos = listOf(Todo(id(state), action.todo)) + state.todos)
+                else -> state
+            }
+        }
 
-	}
+    }
 
 }
