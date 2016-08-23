@@ -31,7 +31,7 @@ interface Middleware<S : Any> {
             val middlewares: Array<out Middleware<S>>) : Store.Creator<S> {
 
         override fun create(
-                reducer: Reducer<S>,
+                reducer: (S, Any) -> S,
                 initialState: S,
                 enhancer: Store.Enhancer<S>?): Store<S> {
 
