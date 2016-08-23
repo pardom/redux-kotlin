@@ -18,24 +18,22 @@ package redux
 
 interface Middleware<S : Any> {
 
-    fun dispatch(store: Store<S>, action: Any, next: Dispatcher): Any
+    private class Enhancer<S : Any>(vararg val middlewares: (Store<S>, Any, Dispatcher) -> Any) : Store.Enhancer<S> {
 
-    private class Enhancer<S : Any>(val middlewares: Array<out Middleware<S>>) : Store.Enhancer<S> {
-
-        override fun enhance(next: Store.Creator<S>): Store.Creator<S> = Creator(next, middlewares)
+        override fun enhance(next: Store.Creator<S>): Store.Creator<S> = Creator(next, *middlewares)
 
     }
 
     private class Creator<S : Any>(
             val creator: Store.Creator<S>,
-            val middlewares: Array<out Middleware<S>>) : Store.Creator<S> {
+            vararg val middlewares: (Store<S>, Any, Dispatcher) -> Any) : Store.Creator<S> {
 
         override fun create(
                 reducer: (S, Any) -> S,
                 initialState: S,
                 enhancer: Store.Enhancer<S>?): Store<S> {
 
-            return Delegate(creator.create(reducer, initialState, enhancer), middlewares)
+            return Delegate(creator.create(reducer, initialState, enhancer), *middlewares)
 
         }
 
@@ -43,7 +41,7 @@ interface Middleware<S : Any> {
 
     private class Delegate<S : Any>(
             store: Store<S>,
-            middlewares: Array<out Middleware<S>>) : Store<S> by store {
+            vararg middlewares: (Store<S>, Any, Dispatcher) -> Any) : Store<S> by store {
 
         val rootDispatcher = middlewares.foldRight(store as Dispatcher) { middleware, next ->
             Wrapper(middleware, store, next)
@@ -54,12 +52,12 @@ interface Middleware<S : Any> {
         }
 
         class Wrapper<S : Any>(
-                val middleware: Middleware<S>,
+                val middleware: (Store<S>, Any, Dispatcher) -> Any,
                 val store: Store<S>,
                 val next: Dispatcher) : Dispatcher {
 
             override fun dispatch(action: Any): Any {
-                return middleware.dispatch(store, action, next)
+                return middleware(store, action, next)
             }
 
         }
@@ -68,8 +66,8 @@ interface Middleware<S : Any> {
 
     companion object {
 
-        fun <S : Any> apply(vararg middlewares: Middleware<S>): Store.Enhancer<S> {
-            return Enhancer(middlewares)
+        fun <S : Any> apply(vararg middlewares: (Store<S>, Any, Dispatcher) -> Any): Store.Enhancer<S> {
+            return Enhancer(*middlewares)
         }
 
     }
