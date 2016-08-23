@@ -1,6 +1,11 @@
 package redux
 
 import org.jetbrains.spek.api.Spek
+import redux.helpers.Reducers
+import redux.helpers.Todos.Action.AddTodo
+import redux.helpers.Todos.State
+import redux.helpers.Todos.Todo
+import kotlin.test.assertEquals
 
 /*
  * Copyright (C) 2016 Michael Pardo
@@ -23,6 +28,26 @@ class MiddlewareTest : Spek({
     describe("Middleware") {
 
         describe("apply") {
+
+            it("wraps dispatch method with middleware once") {
+
+                var dispatches = 0
+                val middleware = { store: Store<State>, action: Any, next: Dispatcher ->
+                    val result = next.dispatch(action)
+                    dispatches++
+                    action
+                }
+
+                val initialState = State(listOf(Todo(1, "Hello")))
+                val store = Store.create(Reducers.TODOS, initialState, Middleware.apply(middleware))
+
+                assertEquals(1, dispatches)
+
+                store.dispatch(AddTodo("World"))
+
+                assertEquals(2, dispatches)
+
+            }
 
         }
 
