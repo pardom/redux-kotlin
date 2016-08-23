@@ -22,11 +22,11 @@ interface Store<S : Any> : Dispatcher {
 
     fun subscribe(subscriber: Subscriber): Subscription
 
-    fun replaceReducer(reducer: Reducer<S>)
+    fun replaceReducer(reducer: (S, Any) -> S)
 
     interface Creator<S : Any> {
 
-        fun create(reducer: Reducer<S>, initialState: S, enhancer: Enhancer<S>? = null): Store<S>
+        fun create(reducer: (S, Any) -> S, initialState: S, enhancer: Enhancer<S>? = null): Store<S>
 
     }
 
@@ -50,13 +50,13 @@ interface Store<S : Any> : Dispatcher {
 
     private class Impl<S : Any> : Store<S> {
 
-        private var reducer: Reducer<S>
+        private var reducer: (S, Any) -> S
         private var state: S
         private var subscribers = mutableListOf<Subscriber>()
 
         private var isDispatching = false
 
-        private constructor(reducer: Reducer<S>, state: S) {
+        private constructor(reducer: (S, Any) -> S, state: S) {
             this.reducer = reducer
             this.state = state
         }
@@ -68,7 +68,7 @@ interface Store<S : Any> : Dispatcher {
 
             try {
                 isDispatching = true
-                state = reducer.reduce(state, action)
+                state = reducer(state, action)
             }
             finally {
                 isDispatching = false
@@ -95,13 +95,13 @@ interface Store<S : Any> : Dispatcher {
             }
         }
 
-        override fun replaceReducer(reducer: Reducer<S>) {
+        override fun replaceReducer(reducer: (S, Any) -> S) {
             this.reducer = reducer
         }
 
         class ImplCreator<S : Any> : Creator<S> {
 
-            override fun create(reducer: Reducer<S>, initialState: S, enhancer: Enhancer<S>?): Store<S> {
+            override fun create(reducer: (S, Any) -> S, initialState: S, enhancer: Enhancer<S>?): Store<S> {
                 return Impl(reducer, initialState)
             }
 
@@ -114,7 +114,7 @@ interface Store<S : Any> : Dispatcher {
         val INIT = Any()
 
         fun <S : Any> create(
-                reducer: Reducer<S>,
+                reducer: (S, Any) -> S,
                 initialState: S,
                 enhancer: Enhancer<S>? = null): Store<S> {
 
