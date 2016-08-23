@@ -16,7 +16,11 @@ package redux
  * limitations under the License.
  */
 
-interface Middleware<S : Any> {
+object Middleware {
+
+    fun <S : Any> apply(vararg middlewares: (Store<S>, Any, Dispatcher) -> Any): Store.Enhancer<S> {
+        return Enhancer(*middlewares)
+    }
 
     private class Enhancer<S : Any>(vararg val middlewares: (Store<S>, Any, Dispatcher) -> Any) : Store.Enhancer<S> {
 
@@ -60,14 +64,6 @@ interface Middleware<S : Any> {
                 return middleware(store, action, next)
             }
 
-        }
-
-    }
-
-    companion object {
-
-        fun <S : Any> apply(vararg middlewares: (Store<S>, Any, Dispatcher) -> Any): Store.Enhancer<S> {
-            return Enhancer(*middlewares)
         }
 
     }
