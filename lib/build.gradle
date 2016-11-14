@@ -12,7 +12,7 @@ configurations {
 }
 
 dependencies {
-	compile 'com.github.jvm-redux:jvm-redux-api:1.1.0'
+	compile 'com.github.jvm-redux.jvm-redux-api:api:specs-SNAPSHOT'
 	compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 
 	testCompile 'junit:junit:4.12'
